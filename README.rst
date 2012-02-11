@@ -1,9 +1,10 @@
-.. _kpk/Package: 
+.. _examples/Package: 
 
-kpk Package
-===========
+Example Applications
+====================
 
-:Authors: Kitson Kelly :Project Owner: Kitson Kelly
+:Authors: Kitson Kelly
+:Project Owner: Kitson Kelly
 
 .. contents ::
     :depth: 2 
