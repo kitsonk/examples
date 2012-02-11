@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Testing a Form in a Dialog</title>
+	
+	<style type="text/css">
+		@import "../dojo/dojo/resources/dojo.css";
+		@import "../dojo/dijit/themes/claro/claro.css";
+		@import "../dojo/dojox/grid/resources/claroGrid.css";
+		
+		html,body {
+			height: 100%;
+			width: 100%;
+		}
+		
+		body {
+			background-color: #E9F4FE;
+			margin: 1em;
+		}
+		
+		#preloader {
+			width: 100%;
+			height: 100%;
+			margin: 0;
+			padding: 1em;
+			background: #fff url('../dojo/dijit/themes/claro/images/loadingAnimation.gif') no-repeat center center;
+			position: absolute;
+			top: 0;
+			left: 0;
+			z-index: 999;
+			font-size: 24px;
+			font-weight: bold;
+		}
+		
+		.claro .instructionBox {
+			text-align: left;
+			margin: 2px auto 7px;
+			padding: 8px;
+			max-width: 300px;
+			background-color: #E9F4FE;
+			border: 1px solid #759DC0;
+			-webkit-border-radius: 4px 4px 4px 4px;
+			-moz-border-radius: 4px 4px 4px 4px;
+			border-radius: 4px 4px 4px 4px;
+			-webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.15);
+			-moz-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.15);
+			box-shadow: 0 1px 1px rgba(0, 0, 0, 0.15);
+		}
+		
+		.formTable td {
+			padding-right: 10px;
+		}
+	</style>
+	<script type="text/javascript" src="../dojo/dojo/dojo.js" data-dojo-config="async:true, locale: 'en-gb'"></script>
+	<script type="text/javascript">
+		require([ "dojo/parser",
+		          "dojo/_base/fx",
+		          "dojo/_base/event",
+		          "dojo/dom-style",
+		          "dijit/_base/manager", 
+		          "dijit/Dialog",
+		          "dijit/form/Button", 
+		          "dijit/form/CurrencyTextBox",
+		          "dijit/form/DateTextBox",
+		          "dijit/form/Form", 
+		          "dijit/form/TextBox",
+		          "dijit/form/ValidationTextBox", 
+		          "dijit/layout/ContentPane",
+		          "dojox/data/JsonRestStore",
+		          "dojox/grid/DataGrid",
+		          "dojo/domReady!"],
+				function(parser, baseFx, event, domStyle, dijit) {
+					demo = {};
+					parser.parse();
+					baseFx.fadeOut({  //Get rid of the loader once parsing is done
+						node: "preloader",
+						onEnd: function() {
+							domStyle.set("preloader","display","none");
+						}
+					}).play();
+				});
+	</script>
+</head>
+<body class="claro">
+	<div id="preloader">Loading Application...</div>
+	<h1>Testing a Form in a Dialog</h1>
+	<div data-dojo-type="dojox.data.JsonRestStore" data-dojo-id="demo.restStore" data-dojo-props="target: 'rest/monies.php'"></div>
+	<div data-dojo-type="dijit.Dialog" id="dialog1" data-dojo-props="title: 'Give me monies...'">
+		<form data-dojo-type="dijit.form.Form">
+			<script type="dojo/on" data-dojo-event="submit" data-dojo-args="e">
+				dojo.stopEvent(e);  // Keeps form from normal submit
+				demo.restStore.newItem(this.get("value"));  // Gets values from form and create new item
+				demo.restStore.save(); // Save the data to the server
+				this.reset(); // Clear the form for next usage
+				dijit.byId("dialog1").hide(); // Hide the dialog
+			</script>
+			<div class="instructionBox">Please provide us with all your
+				personal information, as we recently have started to manage an
+				estate of a very wealthy estate and need to urgently transfer lots
+				of funds to you in order to do something that is supposed to sound
+				logical, but really we are just trying to take your money via a
+				thinly veiled attempt at social engineering. We also have some
+				ocean-front property in Arizona if you are interested.</div>
+			<table class="formTable">
+				<tr>
+					<td><label for="fname">First Name</label></td>
+					<td><input type="text" name="fname"
+						data-dojo-type="dijit.form.TextBox" /></td>
+				</tr>
+				<tr>
+					<td><label for="lname">Last Name</label></td>
+					<td><input type="text" name="lname"
+						data-dojo-type="dijit.form.TextBox" /></td>
+				</tr>
+				<tr>
+					<td><label for="bday">Date of Birth</label></td>
+					<td><input type="text" name="bday"
+						data-dojo-type="dijit.form.DateTextBox"
+						data-dojo-props="placeHolder: 'DD/MM/YYYY'" /></td>
+				</tr>
+				<tr>
+					<td><label for="banksort">Bank Sort Code</label></td>
+					<td><input type="text" name="banksort"
+						data-dojo-type="dijit.form.ValidationTextBox"
+						data-dojo-props="regExp: '\\d{2}-\\d{2}-\\d{2}', invalidMessage: 'Invalid Bank Sort Code', placeHolder: '##-##-##'" /></td>
+				</tr>
+				<tr>
+					<td><label for="bankacct">Bank Account Number</label></td>
+					<td><input type="text" name="bankacct"
+						data-dojo-type="dijit.form.TextBox"
+						data-dojo-props="regExp: '\\d{8}', invalidMessage: 'Invalid Bank Account', placeHolder: '########'" /></td>
+				</tr>
+				<tr>
+					<td><label for="amount">Amount of Monies You Have</label></td>
+					<td><input type="text" name="amount" value="5312123.35"
+						data-dojo-type="dijit.form.CurrencyTextBox"
+						data-dojo-props="constraints:{ fractional:true }, currency:'GBP', invalidMessage:'Invalid amount.	 Include pound sign, commas, and pence.  Pence are mandatory.'" /></td>
+				</tr>
+			</table>
+			<div class="dijitDialogPaneActionBar">
+				<button type="reset" data-dojo-type="dijit.form.Button">Reset</button>
+				<button type="submit" data-dojo-type="dijit.form.Button">Submit</button>
+			</div>
+		</form>
+	</div>
+	<div>
+		<div>&nbsp;</div>
+		<button data-dojo-type="dijit.form.Button">Show Dialog
+			<script type="dojo/on" data-dojo-event="click">
+				dijit.byId("dialog1").show();
+			</script>
+		</button>
+		<div>&nbsp;</div>
+	</div>
+	<div>
+		<table data-dojo-type="dojox.grid.DataGrid" data-dojo-props="store: demo.restStore, noDataMessage: 'No Files...', style: 'width: 800px; height: 300px;'">
+			<thead>
+				<tr>
+					<th field="fname" width="150px">First Name</th>
+					<th field="lname" width="150px">Last Name</th>
+					<th field="bday" width="80px" styles="text-align: center;">DOB</th>
+					<th field="banksort" width="80px" styles="text-align: center;">Sort</th>
+					<th field="bankacct" width="80px" styles="text-align: center;">Acct</th>
+					<th field="amount" width="auto" styles="text-align: right;">Monies</th>
+				</tr>
+			</thead>
+		</table>
+	</div>
+</body>
+</html>
